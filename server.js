@@ -17,6 +17,7 @@ const PROTECTION_BASE_INCREMENT = 0.01; // add 0.01 as you requested
 
 // ---------- MIDDLEWARE ----------
 app.use(cors());
+
 app.use(bodyParser.json());
 
 // ---------- Simple in-memory lock per-variant to serialize updates ----------
