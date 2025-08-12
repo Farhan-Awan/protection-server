@@ -2,12 +2,13 @@
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+require('dotenv').config();
 
 const app = express();
 
 // ---------- CONFIG ----------
 const SHOPIFY_DOMAIN = 'play-farhan.myshopify.com';
-const ADMIN_API_TOKEN = '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';
+const ADMIN_API_TOKEN = process.env.ADMIN_API_TOKEN;
 const API_VERSION = '2025-07'; 
 const PROTECTION_VARIANT_DYNAMIC = '45626932789401';
 const PROTECTION_THRESHOLD = 100; // USD threshold to apply protection
