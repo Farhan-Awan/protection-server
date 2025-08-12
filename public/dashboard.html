@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopify Product Manager</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary: #5c6ac4;
+            --primary-dark: #3a47a1;
+            --secondary: #47c1bf;
+            --light: #f9fafc;
+            --dark: #212b36;
+            --success: #50b83c;
+            --warning: #f49342;
+            --danger: #de3618;
+            --gray: #dfe3e8;
+            --border-radius: 8px;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            color: var(--dark);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--gray);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo i {
+            font-size: 2.5rem;
+            color: var(--primary);
+        }
+        
+        .logo h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .store-info {
+            text-align: right;
+        }
+        
+        .store-name {
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+        
+        .api-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: var(--success);
+            animation: pulse 1.5s infinite;
+        }
+        
+        .main-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        
+        .panel {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 25px;
+            transition: transform 0.3s ease;
+        }
+        
+        .panel:hover {
+            transform: translateY(-5px);
+        }
+        
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--gray);
+        }
+        
+        .panel-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border-radius: var(--border-radius);
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+        
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            opacity: 0.9;
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+        
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--gray);
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: border 0.3s ease;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(92, 106, 196, 0.2);
+        }
+        
+        textarea.form-control {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .product-card {
+            background: white;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .product-image {
+            height: 180px;
+            background: linear-gradient(45deg, #e0e7ff, #d1fae5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 3rem;
+        }
+        
+        .product-info {
+            padding: 15px;
+        }
+        
+        .product-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--dark);
+        }
+        
+        .product-id {
+            font-size: 0.8rem;
+            color: #637381;
+            margin-bottom: 10px;
+        }
+        
+        .product-price {
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin-bottom: 10px;
+        }
+        
+        .notification {
+            padding: 15px;
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .notification-success {
+            background-color: #edf7ed;
+            color: var(--success);
+        }
+        
+        .notification-error {
+            background-color: #fdeded;
+            color: var(--danger);
+        }
+        
+        .variants-container {
+            background: #f8f9fc;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            margin-top: 10px;
+        }
+        
+        .variant-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px dashed #dfe3e8;
+        }
+        
+        .variant-item:last-child {
+            border-bottom: none;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(92, 106, 196, 0.2);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .instructions {
+            background: #f0f4f8;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: #637381;
+        }
+        
+        .instructions ul {
+            margin: 10px 0 10px 20px;
+        }
+        
+        .instructions li {
+            margin-bottom: 5px;
+        }
+        
+        @media (max-width: 768px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+            }
+            
+            header {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }
+            
+            .store-info {
+                text-align: center;
+            }
+        }
+    </style>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-store"></i>
+                <h1>Shopify Product Manager</h1>
+            </div>
+            <div class="store-info">
+                <div class="store-name">nyvddy-0q.myshopify.com</div>
+                <div class="api-status">
+                    <div class="status-indicator"></div>
+                    <span>API Connected</span>
+                </div>
+            </div>
+        </header>
+        
+        <div class="main-layout">
+            <!-- Product List Panel -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h2 class="panel-title">Product Inventory</h2>
+                    <button class="btn btn-primary" id="fetchProducts">
+                        <i class="fas fa-sync-alt"></i> Refresh Products
+                    </button>
+                </div>
+                
+                <div id="productList" class="product-grid">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Create Product Panel -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h2 class="panel-title">Create New Product</h2>
+                </div>
+                
+                <div id="notificationArea"></div>
+                
+                <form id="productForm">
+                    <div class="form-group">
+                        <label for="productTitle">Product Title *</label>
+                        <input type="text" id="productTitle" class="form-control" placeholder="Enter product title" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="productDescription">Description</label>
+                        <textarea id="productDescription" class="form-control" placeholder="Enter product description"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Product Type</label>
+                        <input type="text" id="productType" class="form-control" placeholder="e.g., Shirt, Electronics">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Vendor</label>
+                        <input type="text" id="productVendor" class="form-control" placeholder="Brand or manufacturer">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Tags (comma separated)</label>
+                        <input type="text" id="productTags" class="form-control" placeholder="e.g., summer,new-arrival">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Price *</label>
+                        <input type="number" id="productPrice" class="form-control" placeholder="19.99" step="0.01" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>SKU</label>
+                        <input type="text" id="productSku" class="form-control" placeholder="Product identifier">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Inventory Quantity</label>
+                        <input type="number" id="productInventory" class="form-control" placeholder="Leave empty for no tracking">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Product Images</label>
+                        <input type="file" id="productImages" class="form-control" multiple accept="image/*">
+                        <div id="imagePreview" style="margin-top: 10px;"></div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-plus-circle"></i> Create Product
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const productList = document.getElementById('productList');
+        const productForm = document.getElementById('productForm');
+        const fetchProductsBtn = document.getElementById('fetchProducts');
+        const notificationArea = document.getElementById('notificationArea');
+        const imagePreview = document.getElementById('imagePreview');
+        const imageInput = document.getElementById('productImages');
+        
+        // Store uploaded images
+        let uploadedImages = [];
+        
+        // Display notification
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+                <div>${message}</div>
+            `;
+            
+            notificationArea.innerHTML = '';
+            notificationArea.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                setTimeout(() => notification.remove(), 300);
+            }, 5000);
+        }
+        
+        // Handle image preview
+        imageInput.addEventListener('change', function(e) {
+            imagePreview.innerHTML = '';
+            uploadedImages = [];
+            
+            Array.from(e.target.files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const img = document.createElement('img');
+                    img.src = event.target.result;
+                    img.style.height = '60px';
+                    img.style.marginRight = '10px';
+                    img.style.marginBottom = '10px';
+                    img.style.borderRadius = '4px';
+                    imagePreview.appendChild(img);
+                    
+                    uploadedImages.push(event.target.result);
+                }
+                reader.readAsDataURL(file);
+            });
+        });
+        
+        // Fetch real products from Shopify
+        async function fetchProducts() {
+            productList.innerHTML = `
+                <div style="grid-column: 1 / -1;" class="loading">
+                    <div class="spinner"></div>
+                </div>
+            `;
+            
+            try {
+                const response = await fetch('/api/products');
+                if (!response.ok) throw new Error('Failed to fetch products');
+                
+                const data = await response.json();
+                renderProducts(data.products.slice(0, 4)); // Show last 4 products
+            } catch (error) {
+                showNotification(error.message, 'error');
+                productList.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--danger)">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 2rem;"></i>
+                        <h3>Error loading products</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        // Render product cards with real data
+        function renderProducts(products) {
+            if (products.length === 0) {
+                productList.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 40px;">
+                        <i class="fas fa-box-open" style="font-size: 3rem; color: #dfe3e8; margin-bottom: 15px;"></i>
+                        <h3>No products found</h3>
+                        <p>Create your first product using the form</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            products.forEach(product => {
+                const mainImage = product.images.length > 0 ? 
+                    `<img src="${product.images[0].src}" style="width:100%;height:100%;object-fit:cover;">` : 
+                    `<i class="fas fa-box" style="font-size:2rem;"></i>`;
+                
+                html += `
+                    <div class="product-card">
+                        <div class="product-image">
+                            ${mainImage}
+                        </div>
+                        <div class="product-info">
+                            <h3 class="product-title">${product.title}</h3>
+                            <div class="product-id">ID: ${product.id}</div>
+                            <div class="product-price">$${product.variants[0].price}</div>
+                            <div class="variants-container">
+                                ${product.variants.map(variant => `
+                                    <div class="variant-item">
+                                        <span>${variant.option1 || 'Default'}</span>
+                                        <span>$${variant.price}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            productList.innerHTML = html;
+        }
+        
+        // Create new product
+        async function createProduct(e) {
+            e.preventDefault();
+            
+            const title = document.getElementById('productTitle').value;
+            const description = document.getElementById('productDescription').value;
+            const price = document.getElementById('productPrice').value;
+            const sku = document.getElementById('productSku').value;
+            const inventory = document.getElementById('productInventory').value;
+            const productType = document.getElementById('productType').value;
+            const vendor = document.getElementById('productVendor').value;
+            const tags = document.getElementById('productTags').value;
+            
+            if (!title || !price) {
+                showNotification('Title and price are required', 'error');
+                return;
+            }
+            
+            try {
+                const productData = {
+                    title,
+                    body_html: description,
+                    product_type: productType,
+                    vendor,
+                    tags: tags.split(',').map(tag => tag.trim()).join(','),
+                    variants: [{
+                        price,
+                        sku,
+                        inventory_quantity: inventory ? parseInt(inventory) : null,
+                        inventory_management: inventory ? "shopify" : null
+                    }],
+                    images: uploadedImages.map(img => ({ attachment: img.split(',')[1] })),
+                    status: "active",
+                    published_scope: "web"
+                };
+                
+                const response = await fetch('/api/products', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(productData)
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to create product');
+                }
+                
+                const newProduct = await response.json();
+                showNotification(`Product "${newProduct.title}" created successfully!`, 'success');
+                productForm.reset();
+                imagePreview.innerHTML = '';
+                uploadedImages = [];
+                fetchProducts(); // Refresh the product list
+            } catch (error) {
+                showNotification(error.message, 'error');
+                console.error('Creation error:', error);
+            }
+        }
+        
+        // Event Listeners
+        fetchProductsBtn.addEventListener('click', fetchProducts);
+        productForm.addEventListener('submit', createProduct);
+        
+        // Initial load
+        document.addEventListener('DOMContentLoaded', fetchProducts);
+    </script>
+</body>
+</html>
